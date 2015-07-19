@@ -1,10 +1,23 @@
+/*
+  
+  This example code is in the public domain.
+
+  modified 19 july 2015
+  by Eduardo Nascimento
+
+
+*/
+
+
+
 #include <IRremote.h>
 #include <IRremoteInt.h>
 
-int RECV_PIN = 8;
+#define RECV_PIN        8
+#define RELE_PIN        4
+
 IRrecv irrecv(RECV_PIN);
 decode_results results;
-const int relePin = 4;
 
 void setup() 
 {
@@ -19,6 +32,7 @@ void loop()
   if(irrecv.decode(&results))
   { 
     delay(10);
+
     //Serial.println(results.value);
     if( results.value == 16753245) 
       {
@@ -27,12 +41,16 @@ void loop()
       }
     irrecv.resume();   
   }
+
   int sensorValue = analogRead(A0);
+
   Serial.println(sensorValue);
+
   if(sensorValue > 20k)
     {
       digitalWrite(relePin, !digitalRead(relePin)); 
       delay(500);
     }  
+
   delay(10);        
 }
