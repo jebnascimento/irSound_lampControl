@@ -2,55 +2,59 @@
   
   This example code is in the public domain.
 
-  modified 19 july 2015
+  modified 09 SET 2019
   by Eduardo Nascimento
 
 
 */
 
-
-
 #include <IRremote.h>
-#include <IRremoteInt.h>
 
-#define RECV_PIN        8
-#define RELE_PIN        4
+int RECV_PIN = 9;
+int LUZ = 6;
+int VENT = 5;
+
 
 IRrecv irrecv(RECV_PIN);
+
 decode_results results;
 
-void setup() 
+void setup()
 {
   Serial.begin(9600);
-  pinMode(relePin, OUTPUT);
-  digitalWrite(relePin, LOW);
-  irrecv.enableIRIn();
+  // In case the interrupt driver crashes on setup, give a clue
+  // to the user what's going on.
+  Serial.println("Enabling IRin");
+  irrecv.enableIRIn(); // Start the receiver
+  Serial.println("Enabled IRin");
+  pinMode(VENT, OUTPUT);
+  pinMode(LUZ, OUTPUT);
 }
 
 void loop() 
 {
-  if(irrecv.decode(&results))
-  { 
-    delay(10);
-
-    //Serial.println(results.value);
-    if( results.value == 16753245) 
-      {
-        digitalWrite(relePin, !digitalRead(relePin));
-        delay(500);
-      }
-    irrecv.resume();   
-  }
-
-  int sensorValue = analogRead(A0);
-
-  Serial.println(sensorValue);
-
-  if(sensorValue > 20k)
+  if (irrecv.decode(&results)) 
+  {
+    Serial.println(results.value, DEC);
+    long int value = results.value;
+    Serial.println("\n");
+    Serial.println(value);
+    if(value == 551536185)
     {
-      digitalWrite(relePin, !digitalRead(relePin)); 
+      digitalWrite(LUZ, !digitalRead(LUZ)); 
       delay(500);
-    }  
-
-  delay(10);        
+    }
+    irrecv.resume(); // Receive the next value  
+    delay(10);
+    
+    if(value == 551519865)
+    {
+      digitalWrite(VENT, !digitalRead(VENT)); 
+      delay(500);
+    }
+    irrecv.resume(); // Receive the next value  
+    delay(10);
+  }
+  delay(100);  
 }
+
